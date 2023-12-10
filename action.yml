@@ -35,7 +35,7 @@ runs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        fetch-depth: ${{ inputs.fetch-depts }}
+        fetch-depth: ${{ inputs.fetch-depth }}
     - name: Prepare
       id: prepare
       shell: bash
