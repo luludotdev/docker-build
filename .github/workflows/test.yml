@@ -9,6 +9,7 @@ jobs:
         id: build
         uses: luludotdev/docker-build@master
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           image-name: hello-world
       - name: Image Details
         shell: bash

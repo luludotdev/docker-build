@@ -1,6 +1,9 @@
 name: Docker Build
 description: Build with Docker and push to ghcr.io
 inputs:
+  token:
+    description: GitHub Token
+    required: true
   image-name:
     description: Docker image name
     required: true
@@ -61,7 +64,7 @@ runs:
       with:
         registry: ghcr.io
         username: ${{ steps.prepare.outputs.docker_user }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+        password: ${{ inputs.token }}
     - name: Build and Push
       uses: docker/build-push-action@v5
       with:
