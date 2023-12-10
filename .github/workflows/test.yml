@@ -1,0 +1,15 @@
+name: Workflow Test
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Build
+        id: build
+        uses: luludotdev/docker-build@master
+        with:
+          image-name: hello-world
+      - name: Image Details
+        shell: bash
+        run: "echo image: ${{ steps.build.outputs.image }}"
