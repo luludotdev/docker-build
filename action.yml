@@ -22,6 +22,10 @@ inputs:
     description: Checkout fetch depth
     required: false
     default: ''
+  push:
+    description: Push to ghrc.io
+    required: true
+    default: ${{ (github.ref == 'refs/heads/master') || (contains(github.ref, 'refs/tags/') == true) }}
 outputs:
   image:
     description: Docker image
@@ -70,7 +74,7 @@ runs:
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file }}
-        push: ${{ (github.ref == 'refs/heads/master') || (contains(github.ref, 'refs/tags/') == true) }}
+        push: ${{ inputs.push }}
         tags: |
           ${{ steps.prepare.outputs.docker_image }}:latest
           ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
