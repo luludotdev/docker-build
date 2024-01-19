@@ -4,6 +4,8 @@ on: [push]
 jobs:
   test-unsigned:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Docker Build
         id: build
@@ -16,6 +18,9 @@ jobs:
         run: "echo image: ${{ steps.build.outputs.image }}"
   test-signed:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      id-token: write
     steps:
       - name: Docker Build
         id: build
