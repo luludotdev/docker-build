@@ -2,7 +2,7 @@ name: Workflow Test
 on: [push]
 
 jobs:
-  test:
+  test-unsigned:
     runs-on: ubuntu-latest
     steps:
       - name: Docker Build
@@ -11,6 +11,19 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           image-name: hello-world
+      - name: Image Details
+        shell: bash
+        run: "echo image: ${{ steps.build.outputs.image }}"
+  test-signed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker Build
+        id: build
+        uses: luludotdev/docker-build@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: hello-world-signed
+          sign: true
       - name: Image Details
         shell: bash
         run: "echo image: ${{ steps.build.outputs.image }}"

@@ -26,6 +26,10 @@ inputs:
     description: Push to ghrc.io
     required: true
     default: ${{ (github.ref == 'refs/heads/master') || (contains(github.ref, 'refs/tags/') == true) }}
+  sign:
+    description: Sign the image using Sigstore
+    required: true
+    default: ''
 outputs:
   image:
     description: Docker image
@@ -59,6 +63,9 @@ runs:
         echo "docker_user=${DOCKER_USER}" >> $GITHUB_OUTPUT
         echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
         echo "version=${VERSION}" >> $GITHUB_OUTPUT
+    - name: Install Cosign
+      if: ${{ inputs.sign }}
+      uses: sigstore/cosign-installer@v3.3.0
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: Setup Docker Buildx
@@ -71,6 +78,7 @@ runs:
         password: ${{ inputs.token }}
     - name: Build and Push
       uses: docker/build-push-action@v5
+      id: build-and-push
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file }}
@@ -84,3 +92,12 @@ runs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: ${{ inputs.platforms }}
+    - name: Sign Image
+      if: ${{ inputs.sign }}
+      shell: bash
+      run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+      env:
+        DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        TAGS: |
+          ${{ steps.prepare.outputs.docker_image }}:latest
+          ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
