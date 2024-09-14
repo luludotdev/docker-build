@@ -5,6 +5,7 @@ name: Docker Build
 on: [push, pull_request]
 
 permissions:
+  contents: read
   packages: write
   # id-token: write
   # ^ required for signing

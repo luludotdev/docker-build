@@ -5,6 +5,7 @@ jobs:
   test-unsigned:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       packages: write
     steps:
       - name: Docker Build
@@ -19,6 +20,7 @@ jobs:
   test-signed:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       packages: write
       id-token: write
     steps:
