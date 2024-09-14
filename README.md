@@ -4,6 +4,11 @@
 name: Docker Build
 on: [push, pull_request]
 
+permissions:
+  packages: write
+  # id-token: write
+  # ^ required for signing
+
 jobs:
   test:
     runs-on: ubuntu-latest
