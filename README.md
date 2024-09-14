@@ -11,7 +11,7 @@ permissions:
   # ^ required for signing
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Docker Build
