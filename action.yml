@@ -48,7 +48,7 @@ runs:
       id: prepare
       shell: bash
       run: |
-        IMAGE_NAME=${{ inputs.image-name }}
+        IMAGE_NAME=`echo ${{ inputs.image-name }} | tr '[:upper:]' '[:lower:]'`
 
         GIT_REPO='https://github.com/${{ github.repository }}'
         DOCKER_USER=`echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]'`
