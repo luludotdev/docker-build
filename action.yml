@@ -77,8 +77,10 @@ runs:
         username: ${{ steps.prepare.outputs.docker_user }}
         password: ${{ inputs.token }}
     - name: Build and Push
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       id: build-and-push
+      env:
+        DOCKER_BUILD_RECORD_UPLOAD: false
       with:
         context: ${{ inputs.context }}
         file: ${{ inputs.file }}
