@@ -25,7 +25,7 @@ inputs:
   push:
     description: Push to ghcr.io
     required: true
-    default: ${{ (github.ref_name == github.event.repository.default_branch) || (contains(github.ref, 'refs/tags/') == true) }}
+    default: ${{ github.event_name != 'pull_request' }}
   sign:
     description: Sign the image using Sigstore
     required: true
