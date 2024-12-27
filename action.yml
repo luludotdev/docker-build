@@ -23,7 +23,7 @@ inputs:
     required: false
     default: ""
   push:
-    description: Push to ghrc.io
+    description: Push to ghcr.io
     required: true
     default: ${{ (github.ref_name == github.event.repository.default_branch) || (contains(github.ref, 'refs/tags/') == true) }}
   sign:
