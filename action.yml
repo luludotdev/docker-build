@@ -31,12 +31,9 @@ inputs:
     required: true
     default: ""
 outputs:
-  image:
-    description: Docker image
-    value: ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
-  tag:
-    description: Image tag
-    value: ${{ steps.prepare.outputs.version }}
+  tags:
+    description: Image tags
+    value: ${{ steps.meta.outputs.tags }}
 runs:
   using: composite
   steps:
@@ -44,25 +41,6 @@ runs:
       uses: actions/checkout@v4
       with:
         fetch-depth: ${{ inputs.fetch-depth }}
-    - name: Prepare
-      id: prepare
-      shell: bash
-      run: |
-        IMAGE_NAME=`echo ${{ inputs.image-name }} | tr '[:upper:]' '[:lower:]'`
-
-        GIT_REPO='https://github.com/${{ github.repository }}'
-        DOCKER_USER=`echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]'`
-        DOCKER_IMAGE=ghcr.io/$DOCKER_USER/$IMAGE_NAME
-
-        VERSION=`git rev-parse --short HEAD`
-        if [[ $GITHUB_REF == refs/tags/* ]]; then
-          VERSION=${GITHUB_REF#refs/tags/v}
-        fi
-
-        echo "git_repo=${GIT_REPO}" >> $GITHUB_OUTPUT
-        echo "docker_user=${DOCKER_USER}" >> $GITHUB_OUTPUT
-        echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
-        echo "version=${VERSION}" >> $GITHUB_OUTPUT
     - name: Install Cosign
       if: ${{ inputs.sign }}
       uses: sigstore/cosign-installer@v3.3.0
@@ -74,8 +52,19 @@ runs:
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
-        username: ${{ steps.prepare.outputs.docker_user }}
+        username: ${{ github.actor }}
         password: ${{ inputs.token }}
+    - name: Extract Metadata
+      uses: docker/metadata-action@v5
+      id: meta
+      with:
+        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.image-name }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
+          type=sha,prefix=
+          type=sha,format=long,prefix=
+          type=raw,value=latest,enable={{ is_default_branch }}
     - name: Build and Push
       uses: docker/build-push-action@v6
       id: build-and-push
@@ -85,12 +74,12 @@ runs:
         context: ${{ inputs.context }}
         file: ${{ inputs.file }}
         push: ${{ inputs.push }}
-        tags: |
-          ${{ steps.prepare.outputs.docker_image }}:latest
-          ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        annotations: ${{ steps.meta.outputs.annotations }}
         build-args: |
-          GIT_VERSION=${{ steps.prepare.outputs.version }}
-          GIT_REPO=${{ steps.prepare.outputs.git_repo }}
+          GIT_SHA=${{ github.sha }}
+          GITHUB_REPO=${{ github.repository }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: ${{ inputs.platforms }}
@@ -100,6 +89,4 @@ runs:
       run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
       env:
         DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: |
-          ${{ steps.prepare.outputs.docker_image }}:latest
-          ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        TAGS: ${{ steps.meta.outputs.tags }}
