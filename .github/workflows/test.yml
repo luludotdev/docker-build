@@ -14,9 +14,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           image-name: hello-world
-      - name: Image Details
-        shell: bash
-        run: "echo image: ${{ steps.build.outputs.image }}"
+      # - name: Image Details
+      #   shell: bash
+      #   run: "echo tags: ${{ steps.build.outputs.tags }}"
   test-signed:
     runs-on: ubuntu-latest
     permissions:
@@ -31,6 +31,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           image-name: hello-world-signed
           sign: true
-      - name: Image Details
-        shell: bash
-        run: "echo image: ${{ steps.build.outputs.image }}"
+      # - name: Image Details
+      #   shell: bash
+      #   run: "echo tags: ${{ steps.build.outputs.tags }}"
