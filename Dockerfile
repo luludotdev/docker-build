@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:1.6
+# syntax=docker/dockerfile:1
 FROM hello-world
 
-ARG GIT_VERSION
-ARG GIT_REPO
+ARG GIT_SHA
+ARG GITHUB_REPO
 
-ENV GIT_VERSION=${GIT_VERSION}
-LABEL org.opencontainers.image.source=${GIT_REPO}
+ENV GIT_SHA=${GIT_SHA}
+LABEL github.repo=${GITHUB_REPO}
