@@ -43,7 +43,7 @@ runs:
         fetch-depth: ${{ inputs.fetch-depth }}
     - name: Install Cosign
       if: ${{ inputs.sign }}
-      uses: sigstore/cosign-installer@v3.3.0
+      uses: sigstore/cosign-installer@v3.7.0
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: Setup Docker Buildx
